@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +35,7 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest --cov services
+          pytest --cov services --cov app
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

@@ -1,7 +1,7 @@
 import requests
 
 
-def get_luke_movies_names():
+def get_luke_movies_names() -> list[str]:
     films = requests.get('https://swapi.py4e.com/api/people/1').json()['films']
 
     array_of_names = []
