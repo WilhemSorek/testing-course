@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 import requests
 from requests.exceptions import Timeout
 
-from services.simple_mock_services import get_luke_movies_names
+from services.star_wars_movies_service import get_star_war_movies_names
 
 
 class MockResponse:
@@ -15,7 +15,18 @@ class MockResponse:
 
 
 class TestMock(TestCase):
-    def test_get_all_luke_movies_names(self):
+    def test_get_star_war_movies_names_call_the_right_url(self):
+        response = {
+            'films': []
+        }
+
+        with patch.object(requests, 'get', return_value=MockResponse(response)) as request_mock:
+            get_star_war_movies_names('1')
+
+        request_mock.assert_called_once_with(
+            'https://swapi.py4e.com/api/people/1')
+
+    def test_get_star_war_movies_names_return_expected(self):
         expected_names = ['A New Hope', 'The Empire Strikes Back',
                           'Return of the Jedi', 'Revenge of the Sith', 'The Force Awakens']
         responses = {
@@ -35,22 +46,22 @@ class TestMock(TestCase):
             'https://swapi.py4e.com/api/films/7/': {'title': 'The Force Awakens'},
         }
 
-        with patch.object(requests, 'get', side_effect=lambda url: MockResponse(responses[url])) as request_get_mock:
-            result = get_luke_movies_names()
+        with patch.object(requests, 'get', side_effect=lambda url: MockResponse(responses[url])):
+            result = get_star_war_movies_names('1')
 
         assert result == expected_names
 
-    def test_get_all_luke_movies_names_when_request_raise_exception(self):
+    def test_get_all_movies_names_when_request_raise_exception(self):
         request_get_mock = patch.object(requests, 'get').start()
         request_get_mock.side_effect = Timeout
 
         with self.assertRaises(Timeout):
-            get_luke_movies_names()
+            get_star_war_movies_names('1')
 
-    def test_get_all_luke_movies_names_when_people_request_return_empty_films(self):
+    def test_get_star_war_movies_names_return_empty_films(self):
         expected_names = []
 
-        with patch.object(requests, 'get', return_value=MockResponse({"films": []})) as request_get_mock:
-            result = get_luke_movies_names()
+        with patch.object(requests, 'get', return_value=MockResponse({'films': []})) as request_get_mock:
+            result = get_star_war_movies_names('1')
 
         assert result == expected_names
