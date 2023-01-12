@@ -49,3 +49,19 @@ class TestMock(TestCase):
             retour = get_star_war_movies_names('1')
         
         assert retour == reponsesAttendues
+        assert result == expected_names
+
+    def test_get_all_movies_names_when_request_raise_exception(self):
+        request_get_mock = patch.object(requests, 'get').start()
+        request_get_mock.side_effect = Timeout
+
+        with self.assertRaises(Timeout):
+            get_star_war_movies_names('1')
+
+    def test_get_star_war_movies_names_return_empty_films(self):
+        expected_names = []
+
+        with patch.object(requests, 'get', return_value=MockResponse({'films': []})) as request_get_mock:
+            result = get_star_war_movies_names('1')
+
+        assert result == expected_names
